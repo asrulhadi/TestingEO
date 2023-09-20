@@ -3,17 +3,18 @@
         xmlns:vm="using:TestingEO.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
+        Width="800" Height="650"
         x:Class="TestingEO.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="TestingEO"
         >
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-  <StackPanel>
-    <StackPanel.Styles>
+  <Design.DataContext>
+      <vm:MainWindowViewModel/>
+  </Design.DataContext>
+  <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
+    <Grid.Styles>
       <Style Selector="StackPanel.H">
         <Setter Property="Orientation" Value="Horizontal" />
         <Setter Property="Margin" Value="20,20,20,0" />
@@ -21,61 +22,158 @@
       <Style Selector="StackPanel.V">
         <Setter Property="Orientation" Value="Vertical" />
         <Setter Property="Margin" Value="20,20,20,0" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
       </Style>
       <Style Selector="StackPanel.L">
         <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+      </Style>
+      <Style Selector="StackPanel.T">
+        <Setter Property="Orientation" Value="Vertical" />
         <Setter Property="HorizontalAlignment" Value="Right" />
       </Style>
       <Style Selector="Label">
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="FontFamily" Value="Monospace" />
       </Style>
-    </StackPanel.Styles>
-    <StackPanel Name="Connection" Classes="H" >
+    </Grid.Styles>
+    <StackPanel Grid.Row="0" Name="Connection" Classes="H" >
       <Label Content="Host :" />
-      <TextBox Name="Host" Text="{Binding Host, Mode=OneWayToSource}" Margin="0,0,10,0" Width="150">172.24.176.1</TextBox>
+      <TextBox Name="Host" Text="{Binding Host, Mode=OneWayToSource}" Margin="0,0,10,0" Width="150">192.168.1.42</TextBox>
       <Label Content="Port :" Margin="20,0,0,0" />
       <TextBox Name="Port" Text="{Binding Port, Mode=OneWayToSource}" Margin="0,0,10,0" Width="70" >4000</TextBox>
       <Button Content="Connect" Command="{Binding ConnectToEO}" IsEnabled="{Binding !Connected, Mode=OneWay}"/>
       <Button Content="Close" Command="{Binding CloseConnect}" IsEnabled="{Binding Connected, Mode=OneWay}" />
     </StackPanel>
-    <StackPanel Name="InitSend" Classes="H" >
-      <CheckBox Name="CB1" Command="{Binding CheckedBoxed}" CommandParameter="{Binding #CB1.IsChecked}" IsEnabled="{Binding Connected, Mode=OneWay}" />
-      <Label Content="Send init Data: ff010009000f19" />
-    </StackPanel>
-    <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="20,0" >
-      <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
-        <Label Content="Received All: " />
-        <CheckBox IsChecked="{Binding ReceivedAll, Mode=OneWay}" IsEnabled="False" />
-      </StackPanel>
-      <StackPanel Name="ExpectedReplyC1" Classes="V" Grid.Column="1">
-        <Label Content="Camera 01" FontWeight="Bold" />
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF010059.Data}" /><CheckBox IsChecked="{Binding c1FF010059.Received}" IsEnabled="False" /><Label Content="{Binding c1FF010059.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01005B.Data}" /><CheckBox IsChecked="{Binding c1FF01005B.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01005B.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01005D.Data}" /><CheckBox IsChecked="{Binding c1FF01005D.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01005D.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF010063.Data}" /><CheckBox IsChecked="{Binding c1FF010063.Received}" IsEnabled="False" /><Label Content="{Binding c1FF010063.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01008D.Data}" /><CheckBox IsChecked="{Binding c1FF01008D.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01008D.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01008F.Data}" /><CheckBox IsChecked="{Binding c1FF01008F.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01008F.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100B5.Data}" /><CheckBox IsChecked="{Binding c1FF0100B5.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100B5.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100BF.Data}" /><CheckBox IsChecked="{Binding c1FF0100BF.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100BF.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C1.Data}" /><CheckBox IsChecked="{Binding c1FF0100C1.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C1.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C5.Data}" /><CheckBox IsChecked="{Binding c1FF0100C5.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C5.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C7.Data}" /><CheckBox IsChecked="{Binding c1FF0100C7.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C7.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C9.Data}" /><CheckBox IsChecked="{Binding c1FF0100C9.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C9.Comment}" /></StackPanel>
-      </StackPanel>
-      <StackPanel Background="DarkGray" Width="10" Grid.Column="2"/>
-      <StackPanel Name="ExpectedReplyC2" Classes="V" Grid.Column="3">
-        <Label Content="Camera 02"  FontWeight="Bold" />
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF02005D.Data}" /><CheckBox IsChecked="{Binding c2FF02005D.Received}" IsEnabled="False" /><Label Content="{Binding c2FF02005D.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF020063.Data}" /><CheckBox IsChecked="{Binding c2FF020063.Received}" IsEnabled="False" /><Label Content="{Binding c2FF020063.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF02008D.Data}" /><CheckBox IsChecked="{Binding c2FF02008D.Received}" IsEnabled="False" /><Label Content="{Binding c2FF02008D.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200B5.Data}" /><CheckBox IsChecked="{Binding c2FF0200B5.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200B5.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200B7.Data}" /><CheckBox IsChecked="{Binding c2FF0200B7.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200B7.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200B9.Data}" /><CheckBox IsChecked="{Binding c2FF0200B9.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200B9.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200BB.Data}" /><CheckBox IsChecked="{Binding c2FF0200BB.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200BB.Comment}" /></StackPanel>
-        <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200C3.Data}" /><CheckBox IsChecked="{Binding c2FF0200C3.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200C3.Comment}" /></StackPanel>
-      </StackPanel>
-    </Grid>
-  </StackPanel>
+    <TabControl Grid.Row="1" Name="Command">
+      <TabItem Header="Init">
+        <StackPanel Classes="V">
+          <StackPanel Name="InitSend" Classes="H" >
+            <CheckBox Name="CB1" Command="{Binding CheckedBoxed}" CommandParameter="{Binding #CB1.IsChecked}" IsEnabled="{Binding Connected, Mode=OneWay}" />
+            <Label Content="Send init Data: ff010009000f19" />
+          </StackPanel>
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="20,0" >
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
+              <Label Content="Received All: " />
+              <CheckBox IsChecked="{Binding ReceivedAll, Mode=OneWay}" IsEnabled="False" />
+            </StackPanel>
+            <StackPanel Name="ExpectedReplyC1" Classes="V" Grid.Column="1">
+              <Label Content="Camera 01" FontWeight="Bold" />
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF010059.Data}" /><CheckBox IsChecked="{Binding c1FF010059.Received}" IsEnabled="False" /><Label Content="{Binding c1FF010059.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01005B.Data}" /><CheckBox IsChecked="{Binding c1FF01005B.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01005B.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01005D.Data}" /><CheckBox IsChecked="{Binding c1FF01005D.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01005D.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF010063.Data}" /><CheckBox IsChecked="{Binding c1FF010063.Received}" IsEnabled="False" /><Label Content="{Binding c1FF010063.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01008D.Data}" /><CheckBox IsChecked="{Binding c1FF01008D.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01008D.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01008F.Data}" /><CheckBox IsChecked="{Binding c1FF01008F.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01008F.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100B5.Data}" /><CheckBox IsChecked="{Binding c1FF0100B5.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100B5.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100BF.Data}" /><CheckBox IsChecked="{Binding c1FF0100BF.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100BF.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C1.Data}" /><CheckBox IsChecked="{Binding c1FF0100C1.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C1.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C5.Data}" /><CheckBox IsChecked="{Binding c1FF0100C5.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C5.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C7.Data}" /><CheckBox IsChecked="{Binding c1FF0100C7.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C7.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C9.Data}" /><CheckBox IsChecked="{Binding c1FF0100C9.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C9.Comment}" /></StackPanel>
+            </StackPanel>
+            <StackPanel Background="DarkGray" Width="10" Grid.Column="2"/>
+            <StackPanel Name="ExpectedReplyC2" Classes="V" Grid.Column="3">
+              <Label Content="Camera 02"  FontWeight="Bold" />
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF02005D.Data}" /><CheckBox IsChecked="{Binding c2FF02005D.Received}" IsEnabled="False" /><Label Content="{Binding c2FF02005D.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF020063.Data}" /><CheckBox IsChecked="{Binding c2FF020063.Received}" IsEnabled="False" /><Label Content="{Binding c2FF020063.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF02008D.Data}" /><CheckBox IsChecked="{Binding c2FF02008D.Received}" IsEnabled="False" /><Label Content="{Binding c2FF02008D.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200B5.Data}" /><CheckBox IsChecked="{Binding c2FF0200B5.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200B5.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200B7.Data}" /><CheckBox IsChecked="{Binding c2FF0200B7.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200B7.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200B9.Data}" /><CheckBox IsChecked="{Binding c2FF0200B9.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200B9.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200BB.Data}" /><CheckBox IsChecked="{Binding c2FF0200BB.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200BB.Comment}" /></StackPanel>
+              <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF0200C3.Data}" /><CheckBox IsChecked="{Binding c2FF0200C3.Received}" IsEnabled="False" /><Label Content="{Binding c2FF0200C3.Comment}" /></StackPanel>
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </TabItem>
+      <TabItem Header="Send Data">
+        <StackPanel Classes="V">
+          <StackPanel Classes="H">
+            <TextBlock Text="Pelco Command: " VerticalAlignment="Center" />
+            <TextBox Name="PelcoCmd" Watermark="FFIDCMCMD1D2CC" MinWidth="80" />
+            <Button Content="Send" Command="{Binding SendPelcoCmd}" CommandParameter="{Binding #PelcoCmd.Text}" />
+          </StackPanel>
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0" ShowGridLines="True">
+            <Grid.Styles>
+              <Style Selector="WrapPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+              </Style>
+              <Style Selector="ComboBox">
+                <Setter Property="Margin" Value="10,5,5,5" />
+              </Style>
+              <Style Selector="Button">
+                <Setter Property="Margin" Value="5,5,5,5" />
+                <Setter Property="Command" Value="{Binding PelcoSpecificCmd}" />
+              </Style>
+            </Grid.Styles>
+            <ComboBox Grid.Row="0" Grid.Column="0" Name="CamId" SelectedIndex="0">
+              <ComboBoxItem>1</ComboBoxItem>
+              <ComboBoxItem>2</ComboBoxItem>
+            </ComboBox>
+            <!-- addr -->
+            <WrapPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+              <ComboBox Name="ProcACmd" Items="{Binding ProcA}" Width="250" />
+              <Button Content="Run">
+                <Button.CommandParameter>
+                  <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
+                    <Binding Path="#ProcACmd.SelectedItem" />
+                    <Binding Path="#CamId.SelectedItem.Content" />
+                  </MultiBinding>
+                </Button.CommandParameter>
+              </Button>
+            </WrapPanel>
+            <!-- addr, bool -->
+            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical">
+              <RadioButton Name="OnOffCond" GroupName="OnOff" Content="On" IsChecked="True" />
+              <RadioButton GroupName="OnOff" Content="Off" />
+            </StackPanel>
+            <WrapPanel Grid.Row="1" Grid.Column="1" >
+              <ComboBox Name="ProcBCmd" Items="{Binding ProcB}" Width="250" />
+              <Button Content="Run">
+                <Button.CommandParameter>
+                  <MultiBinding StringFormat="\{0\}@CamId\=\{1\}@\{2\}">
+                    <Binding Path="#ProcBCmd.SelectedItem" />
+                    <Binding Path="#CamId.SelectedItem.Content" />
+                    <Binding Path="#OnOffCond.IsChecked" />
+                  </MultiBinding>
+                </Button.CommandParameter>
+              </Button>
+            </WrapPanel>
+            <!-- addr, data -->
+            <TextBox Grid.Row="2" Grid.Column="0" Name="Data" Watermark="Data to Send" />
+            <WrapPanel Grid.Row="2" Grid.Column="1">
+              <WrapPanel.Styles>
+                <Style Selector="Button">
+                  <Setter Property="CommandParameter">
+                    <MultiBinding StringFormat="\{0\}@CamId\=\{1\}@\{2\}">
+                      <Binding Path="$self.Content" />
+                      <Binding Path="#CamId.SelectedItem.Content" />
+                      <Binding Path="#Data.Text" />
+                    </MultiBinding>
+                  </Setter>
+                </Style>
+              </WrapPanel.Styles>
+              <Button Content="Pan" />
+              <Button Content="Tilt" />
+              <Button Content="Tilt Up" />
+              <Button Content="Pan Left" />
+              <Button Content="Pan Right" />
+              <Button Content="Tilt Down" />
+              <Button Content="Reserved Opcode" />
+              <Button Content="Set Pan Position" />
+              <Button Content="Set Magnification" />
+              <Button Content="Set Tilt Position" />
+              <Button Content="Set Zoom Position" />
+              <Button Content="Query Pan Response" />
+              <Button Content="Query Tilt Response" />
+              <Button Content="Query Zoom Response" />
+              <Button Content="Query Magnification Response" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+    <ListBox Grid.Column="1" Grid.RowSpan="2" Items="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+  </Grid>
 </Window>

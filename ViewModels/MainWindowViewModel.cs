@@ -1,12 +1,19 @@
+using Avalonia.Threading;
 using DotNetty.Extensions;
+using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using TestingEO.Models;
 
 namespace TestingEO.ViewModels
 {
@@ -32,7 +39,9 @@ namespace TestingEO.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         public TcpSocketClient client { get; set; } = null;
+        public Pelco pelco = new();
         public List<byte> Cmd { get; } = new List<byte>();
+        public ObservableCollection<string> Replied { get; set; } = new();
         private List<DataChecked> ListInitC1 = new List<DataChecked>();
         private List<DataChecked> ListInitC2 = new List<DataChecked>();
         public MainWindowViewModel()
@@ -41,6 +50,8 @@ namespace TestingEO.ViewModels
             this.WhenAnyValue(x => x.StatusChanged)
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .Subscribe(_ => ReceivedAll = ListInitC1.TrueForAll(d => d.Received) && ListInitC2.TrueForAll(d => d.Received));
+            pelco.FunctionListReady = InitCommandList;
+            pelco.StartPopulate();
         }
         public void InitReply()
         {
@@ -102,6 +113,44 @@ namespace TestingEO.ViewModels
             ListInitC2.ForEach(d => d.Received = false);
             StatusChanged = 0;
         }
+        public void InitCommandList(Task task)
+        {
+            // wait for the task???
+            // init the list of command 
+            var infos = new (ObservableCollection<string>, Dictionary<string, MethodInfo>)[]
+            {
+                (ProcA, pelco.str2procA),
+                (ProcB, pelco.str2procB),
+                (ProcC, pelco.str2procC)
+            };
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                foreach (var (d,s) in infos)
+                {
+                    var t = s.Keys.ToList(); t.Sort();
+                    d.AddRange(t);
+                }
+            });
+        }
+        public void SendPelcoCmd(string command)
+        {
+            Console.WriteLine("Command to Send {0}", command);
+        }
+        public void PelcoSpecificCmd(string command)
+        {
+            var cmds = command.Split("@");
+            byte camId = Byte.Parse(cmds[1].Split("=")[^1]);
+            var c = cmds.Length switch
+            {
+                3 when bool.TryParse(cmds[2], out bool cond) => pelco.get(cmds[0], camId, cond),
+                3 when int.TryParse(cmds[2], out int data) => pelco.get(cmds[0], camId, data),
+                2 => pelco.get(cmds[0], camId),
+                _ => (new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }, (_,_) => new byte[] { 0xDE, 0xAD, 0xBE, 0xEF })
+            };
+            string cmd = BitConverter.ToString(c.Item1).Replace("-", String.Empty);
+            Console.WriteLine("Command Len={3} with CamId={1} {0} => {2}", command, camId, cmd, cmds.Length );
+            client?.SendAsync(c.Item1);
+        }
         public void ConnectToEO()
         {
             int port;
@@ -132,13 +181,14 @@ namespace TestingEO.ViewModels
         }
         private void ProcessData(byte[] bytes)
         {
-            // make a copy of incming data - in case shared buffer
+            // make a copy of incoming data - in case shared buffer
             int len = bytes.Length;
             byte[] data = new byte[len];
             bytes.CopyTo(data, 0);
             Log.Debug("Data Received: {0}", BitConverter.ToString(data).Replace("-",String.Empty));
             for (int i = 0; i < data.Length; i++)
             {
+                if ((Cmd.Count == 0) && (data[i] != 0xFF)) continue; 
                 try
                 {
                     Cmd.Add(data[i]);
@@ -167,6 +217,12 @@ namespace TestingEO.ViewModels
             Log.Verbose("Searching for: {0}", cmdS);
             Task.Run(() => SearchAndMark(ListInitC1, cmdS));
             Task.Run(() => SearchAndMark(ListInitC2, cmdS));
+            // add to Replied List
+            Dispatcher.UIThread.Post(() =>
+            {
+                while (Replied.Count > 100) Replied.RemoveAt(0);
+                Replied.Add(BitConverter.ToString(cmdB).Replace("-", String.Empty));
+            });
         }
 
         public void CheckedBoxed(bool isChecked)
@@ -189,6 +245,9 @@ namespace TestingEO.ViewModels
 
         public string Host { get; set; }
         public string Port { get; set; }
+        public ObservableCollection<string> ProcA { get; set; } = new();
+        public ObservableCollection<string> ProcB { get; set; } = new();
+        public ObservableCollection<string> ProcC { get; set; } = new();
         [Reactive] public int StatusChanged { get; set; }
         [Reactive] public bool ReceivedAll { get; set; } = false;
         [Reactive] public bool Connected { get; set; } = false;
