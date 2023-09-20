@@ -363,6 +363,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+FodyWeavers.xml
 
 ##
 ## Visual studio for Mac
