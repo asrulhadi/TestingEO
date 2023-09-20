@@ -23,6 +23,8 @@ using Serilog;
 
 using TestingEO.Models;
 
+#pragma warning disable CS8618
+
 namespace TestingEO.ViewModels
 {
     public class DataChecked : ReactiveObject
@@ -46,12 +48,14 @@ namespace TestingEO.ViewModels
     }
     public partial class MainWindowViewModel : ViewModelBase
     {
-        public TcpSocketClient client { get; set; } = null;
+        public TcpSocketClient? client { get; set; } = null;
         public Pelco pelco = new();
         public List<byte> Cmd { get; } = new List<byte>();
         public ObservableCollection<string> Replied { get; set; } = new();
         private List<DataChecked> ListInitC1 = new List<DataChecked>();
         private List<DataChecked> ListInitC2 = new List<DataChecked>();
+
+        IDisposable d;
         public MainWindowViewModel()
         {
             InitReply();
@@ -60,6 +64,10 @@ namespace TestingEO.ViewModels
                 .Subscribe(_ => ReceivedAll = ListInitC1.TrueForAll(d => d.Received) && ListInitC2.TrueForAll(d => d.Received));
             pelco.FunctionListReady = InitCommandList;
             pelco.StartPopulate();
+
+            d = this.WhenAnyValue(x => x.ZoomLevel)
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .Subscribe(x => Debug.WriteLine("ZoomLevel = {0}", x));
         }
         public void InitReply()
         {
@@ -140,7 +148,7 @@ namespace TestingEO.ViewModels
                 }
             });
         }
-        public void SendPelcoCmd(string command)
+        [RelayCommand] private void SendPelco(string command)
         {
             Console.WriteLine("Command to Send {0}", command);
         }
@@ -162,10 +170,11 @@ namespace TestingEO.ViewModels
         }
         [RelayCommand] private void PelcoPTZ(string cmd)
         {
+            if (cmd is null) return;
             var cmds = cmd.Split('@');
             var pelcoCmd = cmds[0];
-            var camId = int.Parse(cmds[1]);
-            var value = cmds.Length == 3 ? int.Parse(cmds[2]) : -1;
+            var camId = int.Parse(cmds[1].Split("=")[^1]);
+            var value = cmds.Length == 3 && int.TryParse(cmds[2], out int val) ? val : -1;
             Debug.WriteLine($"{cmd} => {value}");
         }
         public void ConnectToEO()
@@ -268,6 +277,8 @@ namespace TestingEO.ViewModels
         [Reactive] public int StatusChanged { get; set; }
         [Reactive] public bool ReceivedAll { get; set; } = false;
         [Reactive] public bool Connected { get; set; } = false;
+        [Reactive] public double ZoomLevel { get; set; } = 0;
+
         #region InitC1
         [Reactive] public DataChecked c1FF010059 { get; set; }   // Response Pan Position
         [Reactive] public DataChecked c1FF01005B { get; set; }   // Response Tilt Position
