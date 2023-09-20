@@ -3,8 +3,8 @@
         xmlns:vm="using:TestingEO.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
-        Width="800" Height="650"
+        mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="650"
+        Width="1024" MinWidth="860" Height="650" MinHeight="650"
         x:Class="TestingEO.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="TestingEO"
@@ -113,7 +113,7 @@
             </ComboBox>
             <!-- addr -->
             <WrapPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
-              <ComboBox Name="ProcACmd" Items="{Binding ProcA}" Width="250" />
+              <ComboBox Name="ProcACmd" ItemsSource="{Binding ProcA}" Width="250" />
               <Button Content="Run">
                 <Button.CommandParameter>
                   <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
@@ -129,7 +129,7 @@
               <RadioButton GroupName="OnOff" Content="Off" />
             </StackPanel>
             <WrapPanel Grid.Row="1" Grid.Column="1" >
-              <ComboBox Name="ProcBCmd" Items="{Binding ProcB}" Width="250" />
+              <ComboBox Name="ProcBCmd" ItemsSource="{Binding ProcB}" Width="250" />
               <Button Content="Run">
                 <Button.CommandParameter>
                   <MultiBinding StringFormat="\{0\}@CamId\=\{1\}@\{2\}">
@@ -173,7 +173,25 @@
           </Grid>
         </StackPanel>
       </TabItem>
+      <TabItem Header="Styris">
+        <StackPanel Classes="V" HorizontalAlignment="Stretch" >
+          <StackPanel Classes="H">
+            <Label Connect="Camera: " />
+            <ComboBox Name="Camera" SelectedIndex="0" MinWidth="120" >
+              <ComboBoxItem Content="Day" />
+              <ComboBoxItem Content="IR" />
+            </ComboBox>
+          </StackPanel>
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto" RowDefinitions="*,*,*">
+            <!-- Zoom -->
+            <Label  Grid.Row="0" Grid.Column="0" Content="Zoom" />
+            <Button Grid.Row="0" Grid.Column="1" />
+            <Slider Grid.Row="0" Grid.Column="2" Minimum="0" Maximum="65535" SmallChange="1" />
+            <Button Grid.Row="0" Grid.Column="3" />
+          </Grid>
+        </StackPanel>
+      </TabItem>
     </TabControl>
-    <ListBox Grid.Column="1" Grid.RowSpan="2" Items="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+    <ListBox Grid.Column="1" Grid.RowSpan="2" ItemsSource="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />
   </Grid>
 </Window>
