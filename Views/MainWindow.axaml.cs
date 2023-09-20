@@ -10,9 +10,7 @@ namespace TestingEO.Views
         public MainWindow()
         {
             InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
+
             this.Closing += MainWindow_Closing;
         }
 
@@ -21,9 +19,5 @@ namespace TestingEO.Views
             if (DataContext is MainWindowViewModel vm) vm.Closing(sender, e);
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
     }
 }

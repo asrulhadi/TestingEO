@@ -1,11 +1,8 @@
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace TestingEO.ViewModels
+namespace TestingEO.ViewModels;
+
+public class ViewModelBase : ObservableObject
 {
-    public class ViewModelBase : ReactiveObject
-    {
-    }
 }

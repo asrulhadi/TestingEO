@@ -1,7 +1,10 @@
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.ReactiveUI;
 using System;
+
+using Avalonia;
+using Avalonia.ReactiveUI;
+
+using Projektanker.Icons.Avalonia;
+using Projektanker.Icons.Avalonia.MaterialDesign;
 
 namespace TestingEO
 {
@@ -16,9 +19,15 @@ namespace TestingEO
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
+        {
+            IconProvider.Current
+                .Register<MaterialDesignIconProvider>();
+
+            return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
+                .WithInterFont()
                 .LogToTrace()
                 .UseReactiveUI();
+        }
     }
 }

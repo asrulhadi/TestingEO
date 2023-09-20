@@ -1,9 +1,3 @@
-using Avalonia.Threading;
-using DotNetty.Extensions;
-using DynamicData;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +7,20 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using Avalonia.Threading;
+
+using CommunityToolkit.Mvvm.Input;
+
+using DotNetty.Extensions;
+
+using DynamicData;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Serilog;
+
 using TestingEO.Models;
 
 namespace TestingEO.ViewModels
@@ -36,7 +44,7 @@ namespace TestingEO.ViewModels
             return sama;
         }
     }
-    public class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : ViewModelBase
     {
         public TcpSocketClient client { get; set; } = null;
         public Pelco pelco = new();
@@ -116,7 +124,7 @@ namespace TestingEO.ViewModels
         public void InitCommandList(Task task)
         {
             // wait for the task???
-            // init the list of command 
+            // init the list of command
             var infos = new (ObservableCollection<string>, Dictionary<string, MethodInfo>)[]
             {
                 (ProcA, pelco.str2procA),
@@ -136,7 +144,8 @@ namespace TestingEO.ViewModels
         {
             Console.WriteLine("Command to Send {0}", command);
         }
-        public void PelcoSpecificCmd(string command)
+
+        [RelayCommand] private void PelcoSpecific(string command)
         {
             var cmds = command.Split("@");
             byte camId = Byte.Parse(cmds[1].Split("=")[^1]);
@@ -150,6 +159,14 @@ namespace TestingEO.ViewModels
             string cmd = BitConverter.ToString(c.Item1).Replace("-", String.Empty);
             Console.WriteLine("Command Len={3} with CamId={1} {0} => {2}", command, camId, cmd, cmds.Length );
             client?.SendAsync(c.Item1);
+        }
+        [RelayCommand] private void PelcoPTZ(string cmd)
+        {
+            var cmds = cmd.Split('@');
+            var pelcoCmd = cmds[0];
+            var camId = int.Parse(cmds[1]);
+            var value = cmds.Length == 3 ? int.Parse(cmds[2]) : -1;
+            Debug.WriteLine($"{cmd} => {value}");
         }
         public void ConnectToEO()
         {
@@ -188,7 +205,7 @@ namespace TestingEO.ViewModels
             Log.Debug("Data Received: {0}", BitConverter.ToString(data).Replace("-",String.Empty));
             for (int i = 0; i < data.Length; i++)
             {
-                if ((Cmd.Count == 0) && (data[i] != 0xFF)) continue; 
+                if ((Cmd.Count == 0) && (data[i] != 0xFF)) continue;
                 try
                 {
                     Cmd.Add(data[i]);
@@ -225,7 +242,7 @@ namespace TestingEO.ViewModels
             });
         }
 
-        public void CheckedBoxed(bool isChecked)
+        [RelayCommand] private void CheckedBoxed(bool isChecked)
         {
             if (!isChecked)
             {

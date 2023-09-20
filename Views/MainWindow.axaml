@@ -1,8 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="using:TestingEO.Views"
         xmlns:vm="using:TestingEO.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
         mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="650"
         Width="1024" MinWidth="860" Height="650" MinHeight="650"
         x:Class="TestingEO.Views.MainWindow"
@@ -49,7 +51,7 @@
       <TabItem Header="Init">
         <StackPanel Classes="V">
           <StackPanel Name="InitSend" Classes="H" >
-            <CheckBox Name="CB1" Command="{Binding CheckedBoxed}" CommandParameter="{Binding #CB1.IsChecked}" IsEnabled="{Binding Connected, Mode=OneWay}" />
+            <CheckBox Name="CB1" Command="{Binding CheckedBoxedCommand}" CommandParameter="{Binding #CB1.IsChecked}" IsEnabled="{Binding Connected, Mode=OneWay}" />
             <Label Content="Send init Data: ff010009000f19" />
           </StackPanel>
           <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="20,0" >
@@ -92,7 +94,7 @@
           <StackPanel Classes="H">
             <TextBlock Text="Pelco Command: " VerticalAlignment="Center" />
             <TextBox Name="PelcoCmd" Watermark="FFIDCMCMD1D2CC" MinWidth="80" />
-            <Button Content="Send" Command="{Binding SendPelcoCmd}" CommandParameter="{Binding #PelcoCmd.Text}" />
+            <Button Content="Send" Command="{Binding SendPelcoCommand}" CommandParameter="{Binding #PelcoCmd.Text}" />
           </StackPanel>
           <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0" ShowGridLines="True">
             <Grid.Styles>
@@ -104,7 +106,7 @@
               </Style>
               <Style Selector="Button">
                 <Setter Property="Margin" Value="5,5,5,5" />
-                <Setter Property="Command" Value="{Binding PelcoSpecificCmd}" />
+                <Setter Property="Command" Value="{Binding PelcoSpecificCommand}" />
               </Style>
             </Grid.Styles>
             <ComboBox Grid.Row="0" Grid.Column="0" Name="CamId" SelectedIndex="0">
@@ -174,22 +176,7 @@
         </StackPanel>
       </TabItem>
       <TabItem Header="Styris">
-        <StackPanel Classes="V" HorizontalAlignment="Stretch" >
-          <StackPanel Classes="H">
-            <Label Connect="Camera: " />
-            <ComboBox Name="Camera" SelectedIndex="0" MinWidth="120" >
-              <ComboBoxItem Content="Day" />
-              <ComboBoxItem Content="IR" />
-            </ComboBox>
-          </StackPanel>
-          <Grid ColumnDefinitions="Auto,Auto,*,Auto" RowDefinitions="*,*,*">
-            <!-- Zoom -->
-            <Label  Grid.Row="0" Grid.Column="0" Content="Zoom" />
-            <Button Grid.Row="0" Grid.Column="1" />
-            <Slider Grid.Row="0" Grid.Column="2" Minimum="0" Maximum="65535" SmallChange="1" />
-            <Button Grid.Row="0" Grid.Column="3" />
-          </Grid>
-        </StackPanel>
+        <v:ControlPTZView />
       </TabItem>
     </TabControl>
     <ListBox Grid.Column="1" Grid.RowSpan="2" ItemsSource="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />

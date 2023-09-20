@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TestingEO.Views.ControlPTZView"
+             >
+
+    <StackPanel Classes="V" HorizontalAlignment="Stretch" >
+        <StackPanel Classes="H">
+        <Label Content="Camera: " />
+        <ComboBox Name="Camera" SelectedIndex="0" MinWidth="120" >
+            <ComboBoxItem Content="Day" />
+            <ComboBoxItem Content="IR" />
+        </ComboBox>
+        </StackPanel>
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto" RowDefinitions="*,*,*">
+        <Grid.Styles>
+            <Style Selector="RepeatButton">
+            <Setter Property="Interval" Value="1000" />
+            </Style>
+        </Grid.Styles>
+        <!-- Zoom -->
+        <Label  Grid.Row="0" Grid.Column="0" Content="Zoom" />
+        <RepeatButton Grid.Row="0" Grid.Column="1" i:Attached.Icon="mdi-minus-circle" Command="{Binding PelcoPTZCommand}" >
+            <RepeatButton.CommandParameter>
+            <MultiBinding StringFormat="Zoom_Wide@CamId\=\{0\}@Minus">
+                <Binding Path="#Camera.SelectedImdex" />
+            </MultiBinding>
+            </RepeatButton.CommandParameter>
+        </RepeatButton>
+<!--
+        <Slider Grid.Row="0" Grid.Column="2" Minimum="0" Maximum="65535" SmallChange="1" Command="{Binding PelcoCmdPTZ}" >
+            <Slider.CommandParameter>
+            <MultiBinding StringFormat="Zoom@CamId\=\{0\}@\{1\}">
+                <Binding Path="#Camera.SelectedImdex" />
+                <Binding Path="$self.Value" />
+            </MultiBinding>
+            </Slider.CommandParameter>
+        </Slider>
+ -->
+        <ButtonSpinner>
+        </ButtonSpinner>
+        <RepeatButton Grid.Row="0" Grid.Column="3" i:Attached.Icon="mdi-plus-circle" Command="{Binding PelcoPTZCommand}" >
+            <RepeatButton.CommandParameter>
+            <MultiBinding StringFormat="Zoom_Tele@CamId\=\{0\}@Plus">
+                <Binding Path="#Camera.SelectedImdex" />
+            </MultiBinding>
+            </RepeatButton.CommandParameter>
+        </RepeatButton>
+        </Grid>
+    </StackPanel>
+
+</UserControl>
