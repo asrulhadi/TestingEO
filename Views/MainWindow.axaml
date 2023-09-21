@@ -98,7 +98,7 @@
             <TextBox Name="PelcoCmd" Watermark="FFIDCMCMD1D2CC" MinWidth="80" />
             <Button Content="Send" Command="{Binding SendPelcoCommand}" CommandParameter="{Binding #PelcoCmd.Text}" />
           </StackPanel>
-          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0" ShowGridLines="True">
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0" ShowGridLines="True" >
             <Grid.Styles>
               <Style Selector="WrapPanel">
                 <Setter Property="Orientation" Value="Horizontal" />
@@ -111,10 +111,13 @@
                 <Setter Property="Command" Value="{Binding PelcoSpecificCommand}" />
               </Style>
             </Grid.Styles>
-            <ComboBox Grid.Row="0" Grid.Column="0" Name="CamId" SelectedIndex="0">
-              <ComboBoxItem>1</ComboBoxItem>
-              <ComboBoxItem>2</ComboBoxItem>
-            </ComboBox>
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+              <Label Content="CamId:" />
+              <ComboBox Name="CamId" SelectedIndex="0">
+                <ComboBoxItem>1</ComboBoxItem>
+                <ComboBoxItem>2</ComboBoxItem>
+              </ComboBox>
+            </StackPanel>
             <!-- addr -->
             <WrapPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
               <ComboBox Name="ProcACmd" ItemsSource="{Binding ProcA}" Width="250" />
@@ -128,9 +131,9 @@
               </Button>
             </WrapPanel>
             <!-- addr, bool -->
-            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical">
+            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
               <RadioButton Name="OnOffCond" GroupName="OnOff" Content="On" IsChecked="True" />
-              <RadioButton GroupName="OnOff" Content="Off" />
+              <RadioButton GroupName="OnOff" Content="Off" Margin="20,0,20,0"/>
             </StackPanel>
             <WrapPanel Grid.Row="1" Grid.Column="1" >
               <ComboBox Name="ProcBCmd" ItemsSource="{Binding ProcB}" Width="250" />
@@ -145,7 +148,10 @@
               </Button>
             </WrapPanel>
             <!-- addr, data -->
-            <TextBox Grid.Row="2" Grid.Column="0" Name="Data" Watermark="Data to Send" />
+            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Vertical">
+              <Label Content="Data to Send:" />
+              <TextBox Name="Data" Watermark="Data to Send" />
+            </StackPanel>
             <WrapPanel Grid.Row="2" Grid.Column="1">
               <WrapPanel.Styles>
                 <Style Selector="Button">
@@ -158,17 +164,9 @@
                   </Setter>
                 </Style>
               </WrapPanel.Styles>
-              <Button Content="Pan" />
-              <Button Content="Tilt" />
-              <Button Content="Tilt Up" />
-              <Button Content="Pan Left" />
-              <Button Content="Pan Right" />
-              <Button Content="Tilt Down" />
-              <Button Content="Reserved Opcode" />
-              <Button Content="Set Pan Position" />
+              <Button Content="Set Auxiliary" />
+              <Button Content="Clear Auxiliary" />
               <Button Content="Set Magnification" />
-              <Button Content="Set Tilt Position" />
-              <Button Content="Set Zoom Position" />
               <Button Content="Query Pan Response" />
               <Button Content="Query Tilt Response" />
               <Button Content="Query Zoom Response" />
@@ -186,15 +184,43 @@
               <ComboBoxItem Content="IR" />
             </ComboBox>
           </StackPanel>
-            <v:ControlPTZView Text="Zoom" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535" 
-                              CmdN="Zoom Tele" CmdP="Zoom Wide" CmdS="Set Zoom Position"
-                              Command="{Binding PelcoPTZCommand}" />
-            <v:ControlPTZView Text="Pan" Camera="0" Min="0" Max="35999"
-                              CmdN="Pan Left" CmdP="Pan Right" CmdS="Set Pan Position"
+          <v:ControlPTZView Text="Zoom" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535" 
+                            CmdN="Zoom Tele" CmdP="Zoom Wide" CmdS="Set Zoom Position"
                             Command="{Binding PelcoPTZCommand}" />
-            <v:ControlPTZView Text="Tilt" Camera="0" Min="-4500" Max="4500"
+          <v:ControlPTZView Text="Pan" Camera="0" Min="0" Max="35999"
+                            CmdN="Pan Left" CmdP="Pan Right" CmdS="Set Pan Position"
+                          Command="{Binding PelcoPTZCommand}" />
+          <v:ControlPTZView Text="Tilt" Camera="0" Min="-4500" Max="4500"
                               CmdN="Tilt Down" CmdP="Tilt Up" CmdS="Set Tilt Position"
                           Command="{Binding PelcoPTZCommand}" />
+          <StackPanel Classes="H">
+            <StackPanel.Styles>
+              <Style Selector="Button">
+                <Setter Property="Margin" Value="20,0,0,0" />
+                <Setter Property="CommandParameter">
+                  <MultiBinding StringFormat="\{0\}@CamId\=1@\{1\}">
+                    <ReflectionBinding Path="$self.Content" />
+                    <Binding Path="#Aux.SelectedIndex" />
+                  </MultiBinding>
+                </Setter>
+              </Style>
+            </StackPanel.Styles>
+            <Label Content="Auxiliary: " />
+            <ComboBox Name="Aux" Width="100">
+              <ComboBoxItem>0</ComboBoxItem>
+              <ComboBoxItem>1 - Wiper new EO</ComboBoxItem>
+              <ComboBoxItem>2</ComboBoxItem>
+              <ComboBoxItem>3</ComboBoxItem>
+              <ComboBoxItem>4</ComboBoxItem>
+              <ComboBoxItem>5</ComboBoxItem>
+              <ComboBoxItem>6</ComboBoxItem>
+              <ComboBoxItem>7</ComboBoxItem>
+              <ComboBoxItem>8 - Wiper</ComboBoxItem>
+              <ComboBoxItem>9 - Washer</ComboBoxItem>
+            </ComboBox>
+            <Button Content="Set Auxiliary" Command="{Binding PelcoSpecificCommand}" />
+            <Button Content="Clear Auxiliary" Command="{Binding PelcoSpecificCommand}" />
+          </StackPanel>
         </StackPanel>
       </TabItem>
     </TabControl>

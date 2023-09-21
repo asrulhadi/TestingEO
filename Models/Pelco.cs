@@ -423,21 +423,23 @@ public class Pelco
 		//'General Response'
         Debug.Assert 0 <= addr <= 255, addr
         return command(addr, 0, 0x07, 0, 0x22)
-
-    public byte[] Set_Auxiliary(addr, value)
+    */
+    public byte[] Set_Auxiliary(int addr, int value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert 1 <= value <= 8, value
-        return command(addr, 0, 0x09, 0, value)
+        //'General Response'
+        //Debug.Assert 0 <= addr <= 255, addr
+        //Debug.Assert 1 <= value <= 8, value
+        return command(addr, 0x09, value);
+    }
 
-    public byte[] Clear_Auxiliary(addr, value)
+    public byte[] Clear_Auxiliary(int addr, int value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert 1 <= value <= 8, value
-        return command(addr, 0, 0x0b, 0, value)
-
+        //'General Response'
+        //Debug.Assert 0 <= addr <= 255, addr
+        //Debug.Assert 1 <= value <= 8, value
+        return command(addr, 0x0b, value);
+    }
+    /*
     public byte[] Remote_Reset(int addr)
     {
 		//'General Response'
@@ -512,8 +514,8 @@ public class Pelco
 		//'General Response'
         Debug.Assert 0 <= addr <= 255, addr
         return command(addr, 0, 0x1d, 0, 0)
-
-    __doc__ += '''
+    */
+    /* __doc__ += '''
     Set Pattern Start(0x1F)
     Run Pattern(0x23)
 
@@ -894,6 +896,11 @@ public class Pelco
         return command(addr, 0x5b, degrees);
     }
 
+    /* Query Zoom Position Response(0x5D)
+
+    The position is given in hundredths of a degree and has a range from 0 to 35999 (decimal).
+    Refer to examples listed in description of the “Set Tilt Position”, opcode 0x4D command.
+    */
     public byte[] Query_Zoom_Response(int addr, int value)
     {
         //'Extended Response' # ??? XXX
