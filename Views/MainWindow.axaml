@@ -7,6 +7,8 @@
         xmlns:i="https://github.com/projektanker/icons.avalonia"
         mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="650"
         Width="1024" MinWidth="860" Height="650" MinHeight="650"
+        x:CompileBindings="True"
+        x:DataType="vm:MainWindowViewModel"
         x:Class="TestingEO.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="TestingEO"
@@ -120,7 +122,7 @@
                 <Button.CommandParameter>
                   <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
                     <Binding Path="#ProcACmd.SelectedItem" />
-                    <Binding Path="#CamId.SelectedItem.Content" />
+                    <ReflectionBinding Path="#CamId.SelectedItem.Content" />
                   </MultiBinding>
                 </Button.CommandParameter>
               </Button>
@@ -136,7 +138,7 @@
                 <Button.CommandParameter>
                   <MultiBinding StringFormat="\{0\}@CamId\=\{1\}@\{2\}">
                     <Binding Path="#ProcBCmd.SelectedItem" />
-                    <Binding Path="#CamId.SelectedItem.Content" />
+                    <ReflectionBinding Path="#CamId.SelectedItem.Content" />
                     <Binding Path="#OnOffCond.IsChecked" />
                   </MultiBinding>
                 </Button.CommandParameter>
@@ -149,8 +151,8 @@
                 <Style Selector="Button">
                   <Setter Property="CommandParameter">
                     <MultiBinding StringFormat="\{0\}@CamId\=\{1\}@\{2\}">
-                      <Binding Path="$self.Content" />
-                      <Binding Path="#CamId.SelectedItem.Content" />
+                      <ReflectionBinding Path="$self.Content" />
+                      <ReflectionBinding Path="#CamId.SelectedItem.Content" />
                       <Binding Path="#Data.Text" />
                     </MultiBinding>
                   </Setter>
@@ -176,7 +178,24 @@
         </StackPanel>
       </TabItem>
       <TabItem Header="Styris">
-        <v:ControlPTZView />
+        <StackPanel Classes="V" HorizontalAlignment="Stretch" >
+          <StackPanel Classes="H">
+            <Label Content="Camera: " />
+            <ComboBox Name="Camera" SelectedIndex="0" MinWidth="120" >
+              <ComboBoxItem Content="Day" />
+              <ComboBoxItem Content="IR" />
+            </ComboBox>
+          </StackPanel>
+            <v:ControlPTZView Text="Zoom" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535" 
+                              CmdN="Zoom Tele" CmdP="Zoom Wide" CmdS="Set Zoom Position"
+                              Command="{Binding PelcoPTZCommand}" />
+            <v:ControlPTZView Text="Pan" Camera="0" Min="0" Max="35999"
+                              CmdN="Pan Left" CmdP="Pan Right" CmdS="Set Pan Position"
+                            Command="{Binding PelcoPTZCommand}" />
+            <v:ControlPTZView Text="Tilt" Camera="0" Min="-4500" Max="4500"
+                              CmdN="Tilt Down" CmdP="Tilt Up" CmdS="Set Tilt Position"
+                          Command="{Binding PelcoPTZCommand}" />
+        </StackPanel>
       </TabItem>
     </TabControl>
     <ListBox Grid.Column="1" Grid.RowSpan="2" ItemsSource="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />

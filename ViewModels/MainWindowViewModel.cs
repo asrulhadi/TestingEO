@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using Avalonia.Threading;
-
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using DotNetty.Extensions;
@@ -62,12 +62,13 @@ namespace TestingEO.ViewModels
             this.WhenAnyValue(x => x.StatusChanged)
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .Subscribe(_ => ReceivedAll = ListInitC1.TrueForAll(d => d.Received) && ListInitC2.TrueForAll(d => d.Received));
+
+            //this.WhenAnyValue(x => x.ZoomLevel)
+            //    //.Throttle(TimeSpan.FromMilliseconds(500))
+            //    .Subscribe(x => Debug.WriteLine("ZoomLevel = {0}", x));
+
             pelco.FunctionListReady = InitCommandList;
             pelco.StartPopulate();
-
-            d = this.WhenAnyValue(x => x.ZoomLevel)
-                .Throttle(TimeSpan.FromMilliseconds(500))
-                .Subscribe(x => Debug.WriteLine("ZoomLevel = {0}", x));
         }
         public void InitReply()
         {
@@ -176,6 +177,20 @@ namespace TestingEO.ViewModels
             var camId = int.Parse(cmds[1].Split("=")[^1]);
             var value = cmds.Length == 3 && int.TryParse(cmds[2], out int val) ? val : -1;
             Debug.WriteLine($"{cmd} => {value}");
+            if (pelcoCmd.StartsWith("Set"))
+            {
+                // special case for degrees if value is negative
+                if (value < 0) value += 36000;
+                PelcoSpecific($"{cmds[0]}@{cmds[1]}@{value}");
+            }
+            else
+            {
+                if (pelcoCmd.StartsWith("Zoom")) PelcoSpecific(cmd);
+                else PelcoSpecific($"{cmd}@50");
+                // wait for a while - before send reset
+                Task.Delay(500).Wait();
+                PelcoSpecific($"Reset@CamId={camId}");
+            }
         }
         public void ConnectToEO()
         {
@@ -200,7 +215,7 @@ namespace TestingEO.ViewModels
         public async void CloseConnect()
         {
             if (!Connected) return;
-            await client.ShutdownAsync();
+            await client!.ShutdownAsync();
             Connected = false;
             InitReply();
             client = null;
@@ -274,10 +289,9 @@ namespace TestingEO.ViewModels
         public ObservableCollection<string> ProcA { get; set; } = new();
         public ObservableCollection<string> ProcB { get; set; } = new();
         public ObservableCollection<string> ProcC { get; set; } = new();
-        [Reactive] public int StatusChanged { get; set; }
-        [Reactive] public bool ReceivedAll { get; set; } = false;
-        [Reactive] public bool Connected { get; set; } = false;
-        [Reactive] public double ZoomLevel { get; set; } = 0;
+        [ObservableProperty] private int statusChanged;
+        [ObservableProperty] private bool receivedAll = false;
+        [ObservableProperty] private bool connected = false;
 
         #region InitC1
         [Reactive] public DataChecked c1FF010059 { get; set; }   // Response Pan Position

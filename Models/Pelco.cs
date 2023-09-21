@@ -49,7 +49,7 @@ public class Pelco
                     _ => (null, "null")
                 };
                 if (addTo is null) Debug.WriteLine($"Tak tahu nak tambah {mi.Name} kat mana");
-                //if (loc == "str2procB") Console.WriteLine("Adding to {1}: {0} => {2}", mi.Name, loc, nama);
+                if (loc == "str2procC") Console.WriteLine("Adding to {1}: {0} => {2}", mi.Name, loc, nama);
                 addTo?.Add(nama, mi);
             }
         }
@@ -91,21 +91,15 @@ public class Pelco
     payload bytes(bytes 2 through 6) in the message.
     */
 
-    public (byte[], Func<string, byte, byte[]>) Unknwon(string proc)
+    public (byte[], Func<string, byte, byte[]>) Unknown(string proc)
     {
         Debug.WriteLine("Function <{0}> tak dijumpai", proc);
-        byte[] r = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
+        byte[] r = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF, 0x00, 0xBA, 0xBE };
         return (r, (_, _) => r);
-    }
-    public (byte[], Func<string, byte, byte[]>) get([NotNull] Func<int, int, byte[]> proc, int addr, int data)
-    {
-        byte[] command = proc(addr, data);
-        var parser = get_parser_for(nameof(proc));
-        return (command, parser);
     }
     public (byte[], Func<string, byte, byte[]>) get(string proc, int addr)
     {
-        if (!str2procA.ContainsKey(proc)) return Unknwon(proc);
+        if (!str2procA.ContainsKey(proc)) return Unknown(proc);
         Debug.WriteLine("Command called: {0} with addr={1}", proc, addr);
         byte[] command = (byte[])str2procA[proc]!.Invoke(this, new object[] { addr }) ?? new byte[] { };
         return (command, Parse_General_Response);
@@ -113,24 +107,17 @@ public class Pelco
 
     public (byte[], Func<string, byte, byte[]>) get(string proc, int addr, int data)
     {
-        if (!str2procC.ContainsKey(proc)) return Unknwon(proc);
+        if (!str2procC.ContainsKey(proc)) return Unknown(proc);
         Debug.WriteLine("Command called: {0} with addr={1} data={2}", proc, addr, data);
         byte[] command = (byte[])str2procC[proc]!.Invoke(this, new object[] { addr, data }) ?? new byte[] { };
         return (command, Parse_General_Response);
     }
     public (byte[], Func<string, byte, byte[]>) get(string proc, int addr, bool cond)
     {
-        if (!str2procB.ContainsKey(proc)) return Unknwon(proc);
+        if (!str2procB.ContainsKey(proc)) return Unknown(proc);
         Debug.WriteLine("Command called: {0} with addr={1} cond={2}", proc, addr, cond);
         byte[] command = (byte[])str2procB[proc]!.Invoke(this, new object[] { addr, cond }) ?? new byte[] { };
         return (command, Parse_General_Response);
-    }
-
-    public (byte[], Func<string, byte, byte[]>) get([NotNull] Func<int, bool, byte[]> proc, int addr, bool cond)
-    {
-        byte[] command = proc(addr, cond);
-        var parser = get_parser_for(nameof(proc));
-        return (command, parser);
     }
 
     private byte SYNC = 0xff;
@@ -907,23 +894,6 @@ public class Pelco
         return command(addr, 0x5b, degrees);
     }
 
-    /* Query Zoom Position Response(0x5D)
-
-    The position is given as a ratio based on the device’s Zoom Limit setting.
-    This value can be converted into units of magnification by using the following formula:
-
-        current_magnification = (position / 65535) * zoom_limit
-
-    Where current_zoom_position and zoom_limit are given in units of magnification.
-
-    Example:
-        Given that the zoom limit of the device’s camera is X184,
-        position value is 1781, calculate the current magnification:
-
-        Current magnification = (1781 / 65535) * 184 = approximately X5.
-
-    Note: This message is sent in response to the Query Zoom Position(0x55) command.
-    */
     public byte[] Query_Zoom_Response(int addr, int value)
     {
         //'Extended Response' # ??? XXX
