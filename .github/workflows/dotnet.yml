@@ -1,0 +1,86 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Creating Release
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  GH_REPO: ${{ github.repository }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
+  
+  build:
+    needs: [release]
+    strategy:
+      matrix:
+        runtime: [win10-x64, linux-x64]
+        # os: [windows-latest, ubuntu-latest]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+ 
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release -r $env:Runtime
+      env:
+        Runtime: ${{ matrix.runtime }}
+
+    - name: Publish
+      run: dotnet publish --no-restore -c Release -r $env:Runtime
+      env:
+        Runtime: ${{ matrix.runtime }}
+
+    - name: Upload Published
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.release.outputs.upload_url }}
+        asset_path: ruby-${{ matrix.name }}-${{ steps.platform.outputs.platform }}.tar.gz
+        asset_name: ruby-${{ matrix.name }}-${{ steps.platform.outputs.platform }}.tar.gz
+        asset_content_type: application/gzip
+
+  metadata:
+    name: Publish Release
+    needs: [release, build]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: eregon/publish-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ needs.release.outputs.release_id }}
+    - uses: eregon/keep-last-n-releases@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        n: 3
