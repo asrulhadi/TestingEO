@@ -98,7 +98,7 @@
             <TextBox Name="PelcoCmd" Watermark="FFIDCMCMD1D2CC" MinWidth="80" />
             <Button Content="Send" Command="{Binding SendPelcoCommand}" CommandParameter="{Binding #PelcoCmd.Text}" />
           </StackPanel>
-          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*" Margin="0,10,0,0" ShowGridLines="True" >
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,*" Margin="0,10,0,0" ShowGridLines="True" >
             <Grid.Styles>
               <Style Selector="WrapPanel">
                 <Setter Property="Orientation" Value="Horizontal" />
@@ -147,12 +147,32 @@
                 </Button.CommandParameter>
               </Button>
             </WrapPanel>
+            <!-- addr, Auto-On-Off -->
+            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+              <ComboBox Name="AutoOnOff" SelectedIndex="0">
+                <ComboBoxItem>Auto</ComboBoxItem>
+                <ComboBoxItem>On</ComboBoxItem>
+                <ComboBoxItem>Off</ComboBoxItem>
+              </ComboBox>
+            </StackPanel>
+            <WrapPanel Grid.Row="2" Grid.Column="1" >
+              <ComboBox Name="ProcCCmd" ItemsSource="{Binding ProcC}" Width="250" />
+              <Button Content="Run">
+                <Button.CommandParameter>
+                  <MultiBinding StringFormat="\{0\}@CamId\=\{1\}@\{2\}">
+                    <Binding Path="#ProcCCmd.SelectedItem" />
+                    <ReflectionBinding Path="#CamId.SelectedItem.Content" />
+                    <ReflectionBinding Path="#AutoOnOff.SelectedItem.Content" />
+                  </MultiBinding>
+                </Button.CommandParameter>
+              </Button>
+            </WrapPanel>
             <!-- addr, data -->
-            <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Vertical">
+            <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Vertical">
               <Label Content="Data to Send:" />
               <TextBox Name="Data" Watermark="Data to Send" />
             </StackPanel>
-            <WrapPanel Grid.Row="2" Grid.Column="1">
+            <WrapPanel Grid.Row="3" Grid.Column="1">
               <WrapPanel.Styles>
                 <Style Selector="Button">
                   <Setter Property="CommandParameter">
@@ -166,11 +186,12 @@
               </WrapPanel.Styles>
               <Button Content="Set Auxiliary" />
               <Button Content="Clear Auxiliary" />
-              <Button Content="Set Magnification" />
+              <Button Content="Set Zoom Speed" />
+              <Button Content="Set Focus Speed" />
               <Button Content="Query Pan Response" />
               <Button Content="Query Tilt Response" />
               <Button Content="Query Zoom Response" />
-              <Button Content="Query Magnification Response" />
+              <Button Content="Query Focus Response" />
             </WrapPanel>
           </Grid>
         </StackPanel>
@@ -185,7 +206,10 @@
             </ComboBox>
           </StackPanel>
           <v:ControlPTZView Text="Zoom" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535" 
-                            CmdN="Zoom Tele" CmdP="Zoom Wide" CmdS="Set Zoom Position"
+                            CmdN="Zoom Wide" CmdP="Zoom Tele" CmdS="Set Zoom Position"
+                            Command="{Binding PelcoPTZCommand}" />
+          <v:ControlPTZView Text="Focus" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535"
+                            CmdN="Focus Far" CmdP="Focus Near" CmdS="Set Focus"
                             Command="{Binding PelcoPTZCommand}" />
           <v:ControlPTZView Text="Pan" Camera="0" Min="0" Max="35999"
                             CmdN="Pan Left" CmdP="Pan Right" CmdS="Set Pan Position"
@@ -224,6 +248,9 @@
         </StackPanel>
       </TabItem>
     </TabControl>
-    <ListBox Grid.Column="1" Grid.RowSpan="2" ItemsSource="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+    <Grid Grid.Column="1" Grid.RowSpan="2" RowDefinitions="*,5*">
+      <ListBox Grid.Row="0" ItemsSource="{Binding Filtered}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" Background="Aquamarine"/>
+      <ListBox Grid.Row="1" ItemsSource="{Binding Replied}" Width="160" ScrollViewer.VerticalScrollBarVisibility="Visible" />
+    </Grid>
   </Grid>
 </Window>

@@ -12,6 +12,12 @@ namespace TestingEO.Models;
 
 public class Pelco
 {
+    public enum AutoOnOff
+    {
+        Auto = 0,
+        On = 1,
+        Off = 2
+    }
     /// Original code from https://gist.github.com/jn0/cc5c78f4a0f447a6fb2e45a5d9efa13d
     /// Original code in Python
 
@@ -19,6 +25,7 @@ public class Pelco
     public readonly Dictionary<string, MethodInfo> str2procA = new();
     public readonly Dictionary<string, MethodInfo> str2procB = new();
     public readonly Dictionary<string, MethodInfo> str2procC = new();
+    public readonly Dictionary<string, MethodInfo> str2procD = new();
     public Action<Task> FunctionListReady = _ => { };
     public Pelco()
     {
@@ -45,7 +52,8 @@ public class Pelco
                 {
                     1 => (str2procA, nameof(str2procA)),
                     2 when paramsInfo[1].ParameterType == typeof(bool) => (str2procB, nameof(str2procB)),
-                    2 when paramsInfo[1].ParameterType == typeof(int) => (str2procC, nameof(str2procC)),
+                    2 when paramsInfo[1].ParameterType == typeof(AutoOnOff) => (str2procC, nameof(str2procC)),
+                    2 when paramsInfo[1].ParameterType == typeof(int) => (str2procD, nameof(str2procD)),
                     _ => (null, "null")
                 };
                 if (addTo is null) Debug.WriteLine($"Tak tahu nak tambah {mi.Name} kat mana");
@@ -105,11 +113,18 @@ public class Pelco
         return (command, Parse_General_Response);
     }
 
-    public (byte[], Func<string, byte, byte[]>) get(string proc, int addr, int data)
+    public (byte[], Func<string, byte, byte[]>) get(string proc, int addr, AutoOnOff cond)
     {
         if (!str2procC.ContainsKey(proc)) return Unknown(proc);
+        Debug.WriteLine("Command called: {0} with addr={1} data={2}", proc, addr, cond);
+        byte[] command = (byte[])str2procC[proc]!.Invoke(this, new object[] { addr, cond }) ?? new byte[] { };
+        return (command, Parse_General_Response);
+    }
+    public (byte[], Func<string, byte, byte[]>) get(string proc, int addr, int data)
+    {
+        if (!str2procD.ContainsKey(proc)) return Unknown(proc);
         Debug.WriteLine("Command called: {0} with addr={1} data={2}", proc, addr, data);
-        byte[] command = (byte[])str2procC[proc]!.Invoke(this, new object[] { addr, data }) ?? new byte[] { };
+        byte[] command = (byte[])str2procD[proc]!.Invoke(this, new object[] { addr, data }) ?? new byte[] { };
         return (command, Parse_General_Response);
     }
     public (byte[], Func<string, byte, byte[]>) get(string proc, int addr, bool cond)
@@ -389,7 +404,6 @@ public class Pelco
     what range of presets are valid for that equipment.
     */
     /* Preset
-    AUTO, ON, OFF = 0, 1, 2
 
     public byte[] Set_Preset(addr, presetId)
     {
@@ -543,76 +557,76 @@ public class Pelco
         Debug.Assert 0 <= addr <= 255, addr
         Debug.Assert 0 <= value <= 255, value
         return command(addr, 0, 0x23, 0, value)
+    */
 
-    public byte[] Set_Zoom_Speed(addr, value)
+    public byte[] Set_Zoom_Speed(int addr, int speed)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert 0 <= value <= 3, value
-        return command(addr, 0, 0x25, 0, value)
+        //'General Response'
+        //Debug.Assert 0 <= value <= 3, value
+        return command(addr, 0x25, speed);
+    }
 
-    public byte[] Set_Focus_Speed(addr, value)
+    public byte[] Set_Focus_Speed(int addr, int speed)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert 0 <= value <= 3, value
-        return command(addr, 0, 0x27, 0, value)
+        //'General Response'
+        //Debug.Assert 0 <= value <= 3, value
+        return command(addr, 0x27, speed);
+    }
 
     public byte[] Reset_Camera_to_defaults(int addr)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        return command(addr, 0, 0x29, 0, 0)
+        //'General Response'
+        //Debug.Assert 0 <= addr <= 255, addr
+        return command(addr, 0x29);
+    }
 
-    public byte[] Auto_focus(addr, value)
+    public byte[] Auto_Focus(int addr, AutoOnOff value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert value in (AUTO, ON, OFF), value
-        return command(addr, 0, 0x2b, 0, value)
+        //'General Response'
+        //Debug.Assert value in (AUTO, ON, OFF), value
+        return command(addr, 0x2b, (int)value);
+    }
 
-    public byte[] Auto_Iris(addr, value)
+    public byte[] Auto_Iris(int addr, AutoOnOff value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert value in (AUTO, ON, OFF), value
-        return command(addr, 0, 0x2d, 0, value)
+        //'General Response'
+        //Debug.Assert value in (AUTO, ON, OFF), value
+        return command(addr, 0x2d, (int)value);
+    }
 
-    public byte[] AGC(addr, value)
+    public byte[] AGC(int addr, AutoOnOff value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert value in (AUTO, ON, OFF), value
-        return command(addr, 0, 0x2f, 0, value)
+        //'General Response'
+        //Debug.Assert value in (AUTO, ON, OFF), value
+        return command(addr, 0x2f, (int)value);
+    }
 
-    public byte[] Backlight_compensation(addr, value)
+    public byte[] Backlight_compensation(int addr, AutoOnOff value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert value in (ON, OFF), value
-        return command(addr, 0, 0x31, 0, value)
+        //'General Response'
+        //Debug.Assert value in (ON, OFF), value
+        return command(addr, 0x31, (int)value);
+    }
 
-    public byte[] Auto_white_balance(addr, value)
+    public byte[] Auto_white_balance(int addr, AutoOnOff value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert value in (ON, OFF), value
-        return command(addr, 0, 0x33, 0, value)
+        //'General Response'
+        //Debug.Assert value in (ON, OFF), value
+        return command(addr, 0x33, (int)value);
+    }
 
     public byte[] Enable_device_phase_delay_mode(int addr)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        return command(addr, 0, 0x35, 0, 0)
+        //'General Response'
+        return command(addr, 0x35);
+    }
 
-    public byte[] Set_shutter_speed(addr, value)
+    public byte[] Set_shutter_speed(int addr, int value)
     {
-		//'General Response'
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert 0 <= value <= 65535, value
-        d1, d2 = (value >> 8) & 255, value & 255
-        return command(addr, 0, 0x37, d1, d2)
-
+        //'General Response'
+        return command(addr, 0x37, value);
+    }
+    /*
     public byte[] Adjust_line_lock_phase_delay_0(addr, value)
     {
 		//'General Response'
@@ -708,7 +722,7 @@ public class Pelco
         Debug.Assert 0 <= value <= 65535, value
         d1, d2 = (value >> 8) & 255, value & 255
         return command(addr, 1, 0x43, d1, d2)
-
+ 
     public byte[] Query(addr, value)
         '''This command can only be used in a point to point application.
         A device being queried will respond to any address.
@@ -722,12 +736,6 @@ public class Pelco
         d1, d2 = (value >> 8) & 255, value & 255
         return command(addr, 0, 0x45, d1, d2)
 
-    public byte[] Reserved_Opcode(addr, value)
-        Debug.Assert 0 <= addr <= 255, addr
-        Debug.Assert 0 <= value <= 255, addr
-        return command(addr, 0, value, 0, 0)
-
-    public byte[] Reserved_Opcode_47(int addr) return Reserved_Opcode(addr, 0x47)
     */
 
     #region Extended Command
@@ -907,13 +915,13 @@ public class Pelco
         return command(addr, 0x5d, value);
     }
 
-    /* Set Magnification(0x5F)
+    /* Set Focus(0x5F)
 
     This command is used to set the zoom position of the device.
     The position is given in hundredths of units of magnification.
     Example: a value of 500 means X5.
     */
-    public byte[] Set_Magnification(int addr, int value)
+    public byte[] Set_Focus(int addr, int value)
     {
         //'General Response'
         return command(addr, 0x5f, value);
@@ -925,7 +933,7 @@ public class Pelco
     The response to this command uses opcode 0x63.
     See the description of opcode 0x63 for more information.
     */
-    public byte[] Query_Magnification(int addr)
+    public byte[] Query_Focus(int addr)
     {
         //'Extended Response'
         return command(addr, 0x61);
@@ -936,13 +944,14 @@ public class Pelco
     The value returned is given in hundredths of units of magnification.
     Example: a value of 500 means X5.
     */
-    public byte[] Query_Magnification_Response(int addr, int value)
+    public byte[] Query_Focus_Response(int addr, int value)
     {
         return command(addr, 0x63, value);
     }
     #endregion
 
     #region Reserved Opcode
+    public byte[] Reserved_Opcode_47(int addr) => Reserved_Opcode(addr, 0x47);
     public byte[] Reserved_Opcode_57(int addr) => Reserved_Opcode(addr, 0x57);
     public byte[] Reserved_Opcode_65(int addr) => Reserved_Opcode(addr, 0x65);
     public byte[] Reserved_Opcode_67(int addr) => Reserved_Opcode(addr, 0x67);

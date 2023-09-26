@@ -52,6 +52,7 @@ namespace TestingEO.ViewModels
         public Pelco pelco = new();
         public List<byte> Cmd { get; } = new List<byte>();
         public ObservableCollection<string> Replied { get; set; } = new();
+        public ObservableCollection<string> Filtered { get; set; } = new();
         private List<DataChecked> ListInitC1 = new List<DataChecked>();
         private List<DataChecked> ListInitC2 = new List<DataChecked>();
 
@@ -138,7 +139,8 @@ namespace TestingEO.ViewModels
             {
                 (ProcA, pelco.str2procA),
                 (ProcB, pelco.str2procB),
-                (ProcC, pelco.str2procC)
+                (ProcC, pelco.str2procC),
+                (ProcD, pelco.str2procD)
             };
             Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -162,6 +164,7 @@ namespace TestingEO.ViewModels
             {
                 3 when bool.TryParse(cmds[2], out bool cond) => pelco.get(cmds[0], camId, cond),
                 3 when int.TryParse(cmds[2], out int data) => pelco.get(cmds[0], camId, data),
+                3 when Enum.TryParse<Pelco.AutoOnOff>(cmds[2], out Pelco.AutoOnOff autoOnOff) => pelco.get(cmds[0], camId, autoOnOff),
                 2 => pelco.get(cmds[0], camId),
                 _ => (new byte[] { 0xDE, 0xAD, 0xBE, 0xEF }, (_,_) => new byte[] { 0xDE, 0xAD, 0xBE, 0xEF })
             };
@@ -189,10 +192,18 @@ namespace TestingEO.ViewModels
             }
             else
             {
-                if (pelcoCmd.StartsWith("Zoom")) PelcoSpecific(cmd);
-                else PelcoSpecific($"{cmd}@50");
+                (string nCmd, int delay) = pelcoCmd.Substring(0, 5) switch
+                {
+                    "Zoom " => (cmd, 500),
+                    "Focus" => (cmd, 1000),
+                    _ => ($"{cmd}@50", 500),
+                };
+                //if (pelcoCmd.StartsWith("Zoom")) PelcoSpecific(cmd);
+                //else if (pelcoCmd.StartsWith("Focus")) PelcoSpecific(cmd);
+                //else PelcoSpecific(nCmd);
+                PelcoSpecific(nCmd);
                 // wait for a while - before send reset
-                Task.Delay(500).Wait();
+                Task.Delay(delay).Wait();
                 PelcoSpecific($"Reset@CamId={camId}");
             }
         }
@@ -237,7 +248,10 @@ namespace TestingEO.ViewModels
                 try
                 {
                     Cmd.Add(data[i]);
-                    if (Cmd.Count == 7) SearchAndMark();
+                    if (Cmd.Count == 7)
+                    {
+                        SearchAndMark();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -262,12 +276,37 @@ namespace TestingEO.ViewModels
             Log.Verbose("Searching for: {0}", cmdS);
             Task.Run(() => SearchAndMark(ListInitC1, cmdS));
             Task.Run(() => SearchAndMark(ListInitC2, cmdS));
-            // add to Replied List
-            Dispatcher.UIThread.Post(() =>
+            AddToReplied(cmdB);
+        }
+
+        private void AddToReplied(byte[] cmd)
+        {
+            string replied = BitConverter.ToString(cmd).Replace("-", String.Empty);
+            string[] filtered = new string[]
             {
-                while (Replied.Count > 100) Replied.RemoveAt(0);
-                Replied.Add(BitConverter.ToString(cmdB).Replace("-", String.Empty));
-            });
+                "FFF5",
+                "FFFA",
+                "FF010093",
+                "FF020093",
+            };
+            if (filtered.Any(s => s == replied.Substring(0, s.Length)))
+            {
+                Dispatcher.UIThread.Post(() =>
+                {
+                    while (Filtered.Count > 10) Filtered.RemoveAt(0);
+                    Filtered.Add(replied);
+                });
+            }
+            else
+            {
+                Debug.WriteLine($"Received replied: {replied}");
+                // add to Replied List
+                Dispatcher.UIThread.Post(() =>
+                {
+                    while (Replied.Count > 100) Replied.RemoveAt(0);
+                    Replied.Add(replied);
+                });
+            }
         }
 
         [RelayCommand] private void CheckedBoxed(bool isChecked)
@@ -293,6 +332,7 @@ namespace TestingEO.ViewModels
         public ObservableCollection<string> ProcA { get; set; } = new();
         public ObservableCollection<string> ProcB { get; set; } = new();
         public ObservableCollection<string> ProcC { get; set; } = new();
+        public ObservableCollection<string> ProcD { get; set; } = new();
         [ObservableProperty] private int statusChanged;
         [ObservableProperty] private bool receivedAll = false;
         [ObservableProperty] private bool connected = false;
