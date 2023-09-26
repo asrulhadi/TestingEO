@@ -177,10 +177,11 @@ namespace TestingEO.ViewModels
             var camId = int.Parse(cmds[1].Split("=")[^1]);
             var value = cmds.Length == 3 && int.TryParse(cmds[2], out int val) ? val : -1;
             Debug.WriteLine($"{cmd} => {value}");
-            if (pelcoCmd.StartsWith("Set"))
+            if (pelcoCmd.StartsWith("Set Tilt"))
             {
-                // special case for degrees if value is negative
-                if (value < 0) value += 36000;
+                // tilt is inverse
+                if (value < 0) value = -value;
+                else if (value > 0) value = 36000 - value;
                 PelcoSpecific($"{cmds[0]}@{cmds[1]}@{value}");
             }
             else
