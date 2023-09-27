@@ -154,6 +154,14 @@ namespace TestingEO.ViewModels
         [RelayCommand] private void SendPelco(string command)
         {
             Console.WriteLine("Command to Send {0}", command);
+            string[] cmds = command.Split('@');
+            byte camId = byte.TryParse(cmds[0], out byte i) ? i : (byte)1;
+            byte[] c = Convert.FromHexString(cmds[1]);
+            byte[] d = Convert.FromHexString(cmds[2]);
+            byte s = (byte)(camId + c[0] + c[1] + d[0] + d[1]);
+            byte[] cc = new byte[] { 0xFF, camId, c[0], c[1], d[0], d[1], s };
+            Console.WriteLine("Command to Send {0} => {1}", command, Convert.ToHexString(cc));
+            client?.SendAsync(cc);
         }
 
         [RelayCommand] private void PelcoSpecific(string command)
@@ -194,7 +202,7 @@ namespace TestingEO.ViewModels
             {
                 (string nCmd, int delay) = pelcoCmd.Substring(0, 5) switch
                 {
-                    "Zoom " => (cmd, 500),
+                    "Zoom " => (cmd, 2000),
                     "Focus" => (cmd, 1000),
                     _ => ($"{cmd}@50", 500),
                 };
