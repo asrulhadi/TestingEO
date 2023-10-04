@@ -1,10 +1,13 @@
 using System;
-using Avalonia.Controls;
-using DynamicData.Binding;
-using System.Diagnostics;
-using Avalonia;
-using System.Windows.Input;
 using System.Reactive.Linq;
+using System.Windows.Input;
+
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+
+using DynamicData.Binding;
 
 namespace TestingEO.Views;
 

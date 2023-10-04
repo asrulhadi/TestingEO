@@ -214,7 +214,7 @@
               <ComboBoxItem Content="IR" />
             </ComboBox>
           </StackPanel>
-          <v:ControlPTZView Text="Zoom" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535" 
+          <v:ControlPTZView Text="Zoom" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535"
                             CmdN="Zoom Tele" CmdP="Zoom Wide" CmdS="Set Zoom Position"
                             Command="{Binding PelcoPTZCommand}" />
           <v:ControlPTZView Text="Focus" Camera="{Binding #Camera.SelectedIndex}" Min="0" Max="65535"

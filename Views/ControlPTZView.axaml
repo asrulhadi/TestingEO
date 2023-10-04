@@ -16,28 +16,57 @@
 
   <Grid ColumnDefinitions="100,Auto,*,Auto" RowDefinitions="*">
     <Label  Grid.Column="0" Content="{Binding $parent[v:ControlPTZView].Text}" />
-    <Button Grid.Column="1" icons:Attached.Icon="mdi-minus-circle" Command="{Binding PelcoPTZCommand}" >
-        <Button.CommandParameter>
-            <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
-              <Binding Path="$parent[v:ControlPTZView].CmdN" />
-              <Binding Path="$parent[v:ControlPTZView].Camera" />
-            </MultiBinding>
-        </Button.CommandParameter>
+    <Button Grid.Column="1" Name="NB" icons:Attached.Icon="mdi-minus-circle" >
+        <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding #NB.IsPressed}" ComparisonCondition="Equal" Value="True">
+                <ia:InvokeCommandAction Command="{Binding PelcoPTZCommand}">
+                    <ia:InvokeCommandAction.CommandParameter>
+                        <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
+                            <Binding Path="$parent[v:ControlPTZView].CmdN" />
+                            <Binding Path="$parent[v:ControlPTZView].Camera" />
+                        </MultiBinding>
+                    </ia:InvokeCommandAction.CommandParameter>
+                </ia:InvokeCommandAction>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding #NB.IsPressed}" ComparisonCondition="Equal" Value="False">
+                <ia:InvokeCommandAction Command="{Binding PelcoSpecificCommand}">
+                    <ia:InvokeCommandAction.CommandParameter>
+                        <MultiBinding StringFormat="Reset@CamId={0}">
+                            <Binding Path="$parent[v:ControlPTZView].Camera" />
+                        </MultiBinding>
+                    </ia:InvokeCommandAction.CommandParameter>
+                </ia:InvokeCommandAction>
+            </ia:DataTriggerBehavior>
+        </i:Interaction.Behaviors>
     </Button>
 
-    <Slider Name="Slider" Grid.Column="2"
-            Minimum="{Binding $parent[v:ControlPTZView].Min}" Maximum="{Binding $parent[v:ControlPTZView].Max}" 
+    <Slider Grid.Column="2" Name="Slider"
+            Minimum="{Binding $parent[v:ControlPTZView].Min}" Maximum="{Binding $parent[v:ControlPTZView].Max}"
             SmallChange="1" IsSnapToTickEnabled="True" TickFrequency="1" >
     </Slider>
 
-    <Button Grid.Column="3" icons:Attached.Icon="mdi-plus-circle" Command="{Binding PelcoPTZCommand}" >
-        <Button.CommandParameter>
-            <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
-              <Binding Path="$parent[v:ControlPTZView].CmdP" />
-              <Binding Path="$parent[v:ControlPTZView].Camera" />
-            </MultiBinding>
-        </Button.CommandParameter>
+    <Button Grid.Column="3" Name="PB" icons:Attached.Icon="mdi-plus-circle" >
+        <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding #PB.IsPressed}" ComparisonCondition="Equal" Value="True">
+                <ia:InvokeCommandAction Command="{Binding PelcoPTZCommand}">
+                    <ia:InvokeCommandAction.CommandParameter>
+                        <MultiBinding StringFormat="\{0\}@CamId\=\{1\}">
+                            <Binding Path="$parent[v:ControlPTZView].CmdP" />
+                            <Binding Path="$parent[v:ControlPTZView].Camera" />
+                        </MultiBinding>
+                    </ia:InvokeCommandAction.CommandParameter>
+                </ia:InvokeCommandAction>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding #PB.IsPressed}" ComparisonCondition="Equal" Value="False">
+                <ia:InvokeCommandAction Command="{Binding PelcoSpecificCommand}">
+                    <ia:InvokeCommandAction.CommandParameter>
+                        <MultiBinding StringFormat="Reset@CamId={0}">
+                            <Binding Path="$parent[v:ControlPTZView].Camera" />
+                        </MultiBinding>
+                    </ia:InvokeCommandAction.CommandParameter>
+                </ia:InvokeCommandAction>
+            </ia:DataTriggerBehavior>
+        </i:Interaction.Behaviors>
     </Button>
-
   </Grid>
 </UserControl>
