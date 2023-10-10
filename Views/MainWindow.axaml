@@ -205,7 +205,7 @@
           </Grid>
         </StackPanel>
       </TabItem>
-      <TabItem Header="Styris">
+      <TabItem Header="PTZ">
         <StackPanel Classes="V" HorizontalAlignment="Stretch" >
           <StackPanel Classes="H">
             <Label Content="Camera: " />
