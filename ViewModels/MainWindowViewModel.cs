@@ -206,13 +206,7 @@ namespace TestingEO.ViewModels
                     "Focus" => (cmd, 1000),
                     _ => ($"{cmd}@50", 500),
                 };
-                //if (pelcoCmd.StartsWith("Zoom")) PelcoSpecific(cmd);
-                //else if (pelcoCmd.StartsWith("Focus")) PelcoSpecific(cmd);
-                //else PelcoSpecific(nCmd);
                 PelcoSpecific(nCmd);
-                // wait for a while - before send reset
-                Task.Delay(delay).Wait();
-                PelcoSpecific($"Reset@CamId={camId}");
             }
         }
         public void ConnectToEO()
