@@ -5,8 +5,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="https://github.com/projektanker/icons.avalonia"
-        mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="650"
-        Width="1024" MinWidth="860" Height="650" MinHeight="650"
+        mc:Ignorable="d" d:DesignWidth="860" d:DesignHeight="605"
+        Width="1024" MinWidth="860" Height="605" MinHeight="605"
         x:CompileBindings="True"
         x:DataType="vm:MainWindowViewModel"
         x:Class="TestingEO.Views.MainWindow"
@@ -49,19 +49,18 @@
       <Button Content="Connect" Command="{Binding ConnectToEO}" IsEnabled="{Binding !Connected, Mode=OneWay}"/>
       <Button Content="Close" Command="{Binding CloseConnect}" IsEnabled="{Binding Connected, Mode=OneWay}" />
     </StackPanel>
+
     <TabControl Grid.Row="1" Name="Command">
       <TabItem Header="Init">
         <StackPanel Classes="V">
           <StackPanel Name="InitSend" Classes="H" >
             <CheckBox Name="CB1" Command="{Binding CheckedBoxedCommand}" CommandParameter="{Binding #CB1.IsChecked}" IsEnabled="{Binding Connected, Mode=OneWay}" />
-            <Label Content="Send init Data: ff010009000f19" />
+            <Label Content="Send init Data: FF010009000F19" />
+            <Label Content=" => Received All: " />
+            <CheckBox IsChecked="{Binding ReceivedAll, Mode=OneWay}" IsEnabled="False" />
           </StackPanel>
-          <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="20,0" >
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Top">
-              <Label Content="Received All: " />
-              <CheckBox IsChecked="{Binding ReceivedAll, Mode=OneWay}" IsEnabled="False" />
-            </StackPanel>
-            <StackPanel Name="ExpectedReplyC1" Classes="V" Grid.Column="1">
+          <Grid ColumnDefinitions="Auto,Auto,Auto" Margin="20,0" >
+            <StackPanel Name="ExpectedReplyC1" Classes="V" Grid.Column="0">
               <Label Content="Camera 01" FontWeight="Bold" />
               <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF010059.Data}" /><CheckBox IsChecked="{Binding c1FF010059.Received}" IsEnabled="False" /><Label Content="{Binding c1FF010059.Comment}" /></StackPanel>
               <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF01005B.Data}" /><CheckBox IsChecked="{Binding c1FF01005B.Received}" IsEnabled="False" /><Label Content="{Binding c1FF01005B.Comment}" /></StackPanel>
@@ -76,8 +75,8 @@
               <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C7.Data}" /><CheckBox IsChecked="{Binding c1FF0100C7.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C7.Comment}" /></StackPanel>
               <StackPanel Classes="H" Margin="0"><Label Content="{Binding c1FF0100C9.Data}" /><CheckBox IsChecked="{Binding c1FF0100C9.Received}" IsEnabled="False" /><Label Content="{Binding c1FF0100C9.Comment}" /></StackPanel>
             </StackPanel>
-            <StackPanel Background="DarkGray" Width="10" Grid.Column="2"/>
-            <StackPanel Name="ExpectedReplyC2" Classes="V" Grid.Column="3">
+            <StackPanel Background="DarkGray" Width="10" Grid.Column="1"/>
+            <StackPanel Name="ExpectedReplyC2" Classes="V" Grid.Column="2">
               <Label Content="Camera 02"  FontWeight="Bold" />
               <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF02005D.Data}" /><CheckBox IsChecked="{Binding c2FF02005D.Received}" IsEnabled="False" /><Label Content="{Binding c2FF02005D.Comment}" /></StackPanel>
               <StackPanel Classes="H" Margin="0"><Label Content="{Binding c2FF020063.Data}" /><CheckBox IsChecked="{Binding c2FF020063.Received}" IsEnabled="False" /><Label Content="{Binding c2FF020063.Comment}" /></StackPanel>

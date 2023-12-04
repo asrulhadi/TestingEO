@@ -318,7 +318,7 @@ namespace TestingEO.ViewModels
                 InitReply();
                 return;
             }
-            Debug.WriteLine("Sending init data: {0}", isChecked);
+            Log.Debug("Sending init data: {0}", isChecked);
             client.SendAsync(new byte[] { 0xFF, 0x01, 0x00, 0x09, 0x00, 0x0f, 0x19 });
         }
 

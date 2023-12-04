@@ -4,6 +4,7 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
 using TestingEO.ViewModels;
 using TestingEO.Views;
@@ -16,7 +17,13 @@ namespace TestingEO
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .WriteTo.Async( w => w.File("TestingEO.log", rollingInterval: RollingInterval.Day))
+                .WriteTo.Async(w =>
+                {
+                    // write to file
+                    w.File("TestingEO.log", rollingInterval: RollingInterval.Day);
+                    // write to console
+                    w.Console(theme: AnsiConsoleTheme.Code);
+                })
                 .CreateLogger();
             AvaloniaXamlLoader.Load(this);
         }

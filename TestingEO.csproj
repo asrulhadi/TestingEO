@@ -26,9 +26,10 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="DotNetty.Extensions" Version="2.0.2" />
     <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="8.2.0" />
-    <PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="19.5.1" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(BuildFor)' == 'RasPi'">
@@ -39,7 +40,7 @@
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(BuildFor)' == 'Win'">
+  <PropertyGroup Condition="'$(BuildFor)' == 'Window'">
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
   </PropertyGroup>
 
@@ -47,7 +48,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <IncludeSymbolsInSingleFile>false</IncludeSymbolsInSingleFile>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <!-- <PublishReadyToRun>true</PublishReadyToRun> -->
   </PropertyGroup>
 
   <PropertyGroup>
